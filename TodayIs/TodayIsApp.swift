@@ -9,9 +9,20 @@ import SwiftUI
 
 @main
 struct TodayIsApp: App {
+    @State private var store       = GoalStore()
+    @State private var showSplash  = true
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ZStack {
+                RootView()
+                    .environment(store)
+
+                if showSplash {
+                    SplashView(isShowing: $showSplash)
+                        .transition(.opacity)
+                }
+            }
         }
     }
 }
