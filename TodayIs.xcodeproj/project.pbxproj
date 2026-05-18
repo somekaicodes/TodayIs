@@ -12,6 +12,7 @@
 		B74E603C2FBAD25700273E27 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B74E603B2FBAD25400273E27 /* RootView.swift */; };
 		B74E603E2FBAD34D00273E27 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B74E603D2FBAD34300273E27 /* SidebarView.swift */; };
 		B74E60402FBAD38900273E27 /* NewCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B74E603F2FBAD37A00273E27 /* NewCalendarView.swift */; };
+		B74E60422FBAD3E200273E27 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B74E60412FBAD3D700273E27 /* CalendarView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +22,7 @@
 		B74E603B2FBAD25400273E27 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		B74E603D2FBAD34300273E27 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
 		B74E603F2FBAD37A00273E27 /* NewCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewCalendarView.swift; sourceTree = "<group>"; };
+		B74E60412FBAD3D700273E27 /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -63,6 +65,7 @@
 		B74E60372FBAD12500273E27 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				B74E60412FBAD3D700273E27 /* CalendarView.swift */,
 				B74E603F2FBAD37A00273E27 /* NewCalendarView.swift */,
 				B74E603D2FBAD34300273E27 /* SidebarView.swift */,
 				B74E603B2FBAD25400273E27 /* RootView.swift */,
@@ -147,6 +150,7 @@
 			files = (
 				B74E60352FBAD11700273E27 /* TodayIsApp.swift in Sources */,
 				B74E60402FBAD38900273E27 /* NewCalendarView.swift in Sources */,
+				B74E60422FBAD3E200273E27 /* CalendarView.swift in Sources */,
 				B74E603E2FBAD34D00273E27 /* SidebarView.swift in Sources */,
 				B74E603C2FBAD25700273E27 /* RootView.swift in Sources */,
 			);
