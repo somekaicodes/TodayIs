@@ -5,10 +5,10 @@
 //  Created by Kai Kim on 2026-05-17.
 //
 
+import SwiftData
 import SwiftUI
 
 struct CalendarView: View {
-    @Environment(GoalStore.self) private var store
     let calendar: GoalCalendar
 
     @State private var viewingMonth: Int = 1
@@ -241,7 +241,10 @@ struct DayCellView: View {
 }
 
 #Preview {
-    let store = GoalStore()
-    store.add(title: "Work out every day", startDate: Calendar.current.date(byAdding: .day, value: -45, to: .now)!)
-    return RootView().environment(store)
+    let calendar = GoalCalendar(
+        title: "Work out every day",
+        startDate: Calendar.current.date(byAdding: .day, value: -45, to: .now)!
+    )
+    CalendarView(calendar: calendar)
+        .modelContainer(for: [GoalCalendar.self, StreakRecord.self], inMemory: true)
 }

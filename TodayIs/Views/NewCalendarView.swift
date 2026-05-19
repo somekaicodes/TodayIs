@@ -5,13 +5,15 @@
 //  Created by Kai Kim on 2026-05-17.
 //
 
+import SwiftData
 import SwiftUI
 
 struct NewCalendarView: View {
-    @Environment(GoalStore.self) private var store
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Binding var selectedID: UUID?
 
-    @State private var title     = ""
+    @State private var title = ""
     @State private var startDate = Calendar.current.startOfDay(for: .now)
 
     var body: some View {
@@ -45,17 +47,29 @@ struct NewCalendarView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Create") {
-                        guard !title.trimmingCharacters(in: .whitespaces).isEmpty else { return }
-                        store.add(title: title.trimmingCharacters(in: .whitespaces), startDate: startDate)
-                        dismiss()
+                        createCalendar()
                     }
-                    .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty)
+                    .disabled(trimmedTitle.isEmpty)
                 }
             }
         }
     }
+
+    private var trimmedTitle: String {
+        title.trimmingCharacters(in: .whitespaces)
+    }
+
+    private func createCalendar() {
+        guard !trimmedTitle.isEmpty else { return }
+        let calendar = GoalCalendar(title: trimmedTitle, startDate: startDate)
+        modelContext.insert(calendar)
+        selectedID = calendar.id
+        try? modelContext.save()
+        dismiss()
+    }
 }
 
 #Preview {
-    NewCalendarView().environment(GoalStore())
+    NewCalendarView(selectedID: .constant(nil))
+        .modelContainer(for: [GoalCalendar.self, StreakRecord.self], inMemory: true)
 }

@@ -5,18 +5,25 @@
 //  Created by Kai Kim on 2026-05-17.
 //
 
+import SwiftData
 import SwiftUI
 
 @main
 struct TodayIsApp: App {
-    @State private var store       = GoalStore()
-    @State private var showSplash  = true
-    
+    @State private var showSplash = true
+
+    private let modelContainer: ModelContainer = {
+        do {
+            return try makeTodayIsModelContainer()
+        } catch {
+            fatalError("Failed to create SwiftData model container: \(error)")
+        }
+    }()
+
     var body: some Scene {
         WindowGroup {
             ZStack {
                 RootView()
-                    .environment(store)
 
                 if showSplash {
                     SplashView(isShowing: $showSplash)
@@ -24,5 +31,6 @@ struct TodayIsApp: App {
                 }
             }
         }
+        .modelContainer(modelContainer)
     }
 }

@@ -5,10 +5,11 @@
 //  Created by Kai Kim on 2026-05-17.
 //
 
+import SwiftData
 import SwiftUI
 
 struct ResetView: View {
-    @Environment(GoalStore.self) private var store
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     let calendar: GoalCalendar
 
@@ -33,8 +34,7 @@ struct ResetView: View {
 
                 Section {
                     Button(role: .destructive) {
-                        store.reset(id: calendar.id)
-                        dismiss()
+                        resetCalendar()
                     } label: {
                         HStack {
                             Spacer()
@@ -54,10 +54,27 @@ struct ResetView: View {
             }
         }
     }
+
+    private func resetCalendar() {
+        let ymd = calendar.elapsedYMD()
+        let record = StreakRecord(
+            years: ymd.years,
+            months: ymd.months,
+            days: ymd.days,
+            savedDate: .now
+        )
+        calendar.streakHistory.append(record)
+        calendar.startDate = Calendar.current.startOfDay(for: .now)
+        try? modelContext.save()
+        dismiss()
+    }
 }
 
 #Preview {
-    let store = GoalStore()
-    store.add(title: "Work out", startDate: Calendar.current.date(byAdding: .day, value: -60, to: .now)!)
-    return ResetView(calendar: store.calendars[0]).environment(store)
+    let calendar = GoalCalendar(
+        title: "Work out",
+        startDate: Calendar.current.date(byAdding: .day, value: -60, to: .now)!
+    )
+    ResetView(calendar: calendar)
+        .modelContainer(for: [GoalCalendar.self, StreakRecord.self], inMemory: true)
 }

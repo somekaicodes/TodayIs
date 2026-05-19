@@ -5,21 +5,30 @@
 //  Created by Kai Kim on 2026-05-17.
 //
 
+import SwiftData
 import SwiftUI
 
 struct RootView: View {
-    @Environment(GoalStore.self) private var store
+    @Query private var calendars: [GoalCalendar]
+    @State private var selectedID: UUID?
     @State private var showNewCalendar = false
-    @State private var showSidebar     = false
-    
+    @State private var showSidebar = false
+
+    private var selectedCalendar: GoalCalendar? {
+        if let selectedID,
+           let calendar = calendars.first(where: { $0.id == selectedID }) {
+            return calendar
+        }
+        return calendars.first
+    }
+
     var body: some View {
-        @Bindable var st = store
         NavigationStack {
             Group {
-                if store.calendars.isEmpty {
+                if calendars.isEmpty {
                     EmptyStateView(showNew: $showNewCalendar)
-                } else if let cal = store.selected {
-                    CalendarView(calendar: cal)
+                } else if let calendar = selectedCalendar {
+                    CalendarView(calendar: calendar)
                 } else {
                     EmptyStateView(showNew: $showNewCalendar)
                 }
@@ -27,7 +36,6 @@ struct RootView: View {
             .navigationTitle("Today is ...")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                // Left: sidebar toggle
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
                         showSidebar = true
@@ -35,7 +43,7 @@ struct RootView: View {
                         Image(systemName: "line.3.horizontal")
                     }
                 }
-                // Right: new calendar
+
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         showNewCalendar = true
@@ -45,16 +53,25 @@ struct RootView: View {
                 }
             }
         }
-        // Sidebar sheet
+        .onAppear(perform: refreshSelection)
+        .onChange(of: calendars.map(\.id)) { _, _ in
+            refreshSelection()
+        }
         .sheet(isPresented: $showSidebar) {
-            SidebarView()
+            SidebarView(selectedID: $selectedID)
                 .presentationDetents([.medium, .large])
         }
-        // New calendar sheet
         .sheet(isPresented: $showNewCalendar) {
-            NewCalendarView()
+            NewCalendarView(selectedID: $selectedID)
                 .presentationDetents([.medium])
         }
+    }
+
+    private func refreshSelection() {
+        if let selectedID, calendars.contains(where: { $0.id == selectedID }) {
+            return
+        }
+        selectedID = calendars.first?.id
     }
 }
 
@@ -84,5 +101,6 @@ struct EmptyStateView: View {
 }
 
 #Preview {
-    RootView().environment(GoalStore())
+    RootView()
+        .modelContainer(for: [GoalCalendar.self, StreakRecord.self], inMemory: true)
 }

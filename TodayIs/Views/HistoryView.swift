@@ -5,25 +5,21 @@
 //  Created by Kai Kim on 2026-05-17.
 //
 
+import SwiftData
 import SwiftUI
 
 struct HistoryView: View {
-    @Environment(GoalStore.self) private var store
     @Environment(\.dismiss) private var dismiss
     let calendar: GoalCalendar
 
     @State private var editingRecord: StreakRecord?
 
-    private var cal: GoalCalendar? {
-        store.calendars.first { $0.id == calendar.id }
-    }
-
     var body: some View {
         NavigationStack {
             Group {
-                if let cal, !cal.streakHistory.isEmpty {
+                if !calendar.streakHistory.isEmpty {
                     List {
-                        ForEach(cal.streakHistory.reversed()) { record in
+                        ForEach(calendar.streakHistory.reversed()) { record in
                             HStack {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(record.display)
@@ -59,7 +55,7 @@ struct HistoryView: View {
                     }
                 }
             }
-            .navigationTitle("History — \(calendar.title)")
+            .navigationTitle("History - \(calendar.title)")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
@@ -68,7 +64,7 @@ struct HistoryView: View {
             }
         }
         .sheet(item: $editingRecord) { record in
-            EditStreakView(calendar: calendar, record: record)
+            EditStreakView(record: record)
                 .presentationDetents([.medium])
         }
     }
@@ -77,15 +73,14 @@ struct HistoryView: View {
 // MARK: - Edit streak (can only reduce)
 
 struct EditStreakView: View {
-    @Environment(GoalStore.self) private var store
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
 
-    let calendar: GoalCalendar
-    let record:   StreakRecord
+    let record: StreakRecord
 
-    @State private var years:  Int = 0
+    @State private var years: Int = 0
     @State private var months: Int = 0
-    @State private var days:   Int = 0
+    @State private var days: Int = 0
     @State private var showError = false
 
     private var editedTotal: Int { years * 365 + months * 30 + days }
@@ -94,9 +89,9 @@ struct EditStreakView: View {
         NavigationStack {
             Form {
                 Section {
-                    Stepper("Years: \(years)",  value: $years,  in: 0...record.years)
+                    Stepper("Years: \(years)", value: $years, in: 0...record.years)
                     Stepper("Months: \(months)", value: $months, in: 0...11)
-                    Stepper("Days: \(days)",    value: $days,   in: 0...29)
+                    Stepper("Days: \(days)", value: $days, in: 0...29)
                 } header: {
                     Text("Edit streak (can only reduce)")
                 } footer: {
@@ -128,28 +123,28 @@ struct EditStreakView: View {
                 }
             }
             .onAppear {
-                years  = record.years
+                years = record.years
                 months = record.months
-                days   = record.days
+                days = record.days
             }
         }
     }
 
     private func saveEdit() {
-        guard var cal = store.calendars.first(where: { $0.id == calendar.id }),
-              let idx = cal.streakHistory.firstIndex(where: { $0.id == record.id })
-        else { return }
-
-        cal.streakHistory[idx].years  = years
-        cal.streakHistory[idx].months = months
-        cal.streakHistory[idx].days   = days
-        store.update(cal)
+        record.years = years
+        record.months = months
+        record.days = days
+        try? modelContext.save()
         dismiss()
     }
 }
 
 #Preview {
-    let store = GoalStore()
-    store.add(title: "Work out", startDate: Calendar.current.date(byAdding: .day, value: -400, to: .now)!)
-    return HistoryView(calendar: store.calendars[0]).environment(store)
+    let calendar = GoalCalendar(
+        title: "Work out",
+        startDate: Calendar.current.date(byAdding: .day, value: -400, to: .now)!,
+        streakHistory: [StreakRecord(years: 1, months: 1, days: 5, savedDate: .now)]
+    )
+    HistoryView(calendar: calendar)
+        .modelContainer(for: [GoalCalendar.self, StreakRecord.self], inMemory: true)
 }

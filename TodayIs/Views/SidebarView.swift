@@ -5,12 +5,15 @@
 //  Created by Kai Kim on 2026-05-17.
 //
 
+import SwiftData
 import SwiftUI
 
 struct SidebarView: View {
-    @Environment(GoalStore.self) private var store
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    @State private var showNewCalendar   = false
+    @Query private var calendars: [GoalCalendar]
+    @Binding var selectedID: UUID?
+    @State private var showNewCalendar = false
     @State private var showDeleteConfirm = false
     @State private var deleteID: UUID?
 
@@ -18,12 +21,15 @@ struct SidebarView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 0) {
-                    ForEach(store.calendars) { cal in
-                        SidebarRow(cal: cal) {
-                            store.selectedID = cal.id
+                    ForEach(calendars) { calendar in
+                        SidebarRow(
+                            calendar: calendar,
+                            isSelected: selectedID == calendar.id
+                        ) {
+                            selectedID = calendar.id
                             dismiss()
                         } onDelete: {
-                            deleteID         = cal.id
+                            deleteID = calendar.id
                             showDeleteConfirm = true
                         }
                         Divider().padding(.leading, 16)
@@ -44,7 +50,8 @@ struct SidebarView: View {
             }
         }
         .sheet(isPresented: $showNewCalendar) {
-            NewCalendarView().presentationDetents([.medium])
+            NewCalendarView(selectedID: $selectedID)
+                .presentationDetents([.medium])
         }
         .confirmationDialog(
             "Delete this calendar?",
@@ -52,18 +59,32 @@ struct SidebarView: View {
             titleVisibility: .visible
         ) {
             Button("Delete", role: .destructive) {
-                if let id = deleteID { store.delete(id: id) }
+                deleteCalendar()
             }
             Button("Cancel", role: .cancel) {}
         }
+    }
+
+    private func deleteCalendar() {
+        guard let deleteID,
+              let calendar = calendars.first(where: { $0.id == deleteID })
+        else { return }
+
+        if selectedID == deleteID {
+            selectedID = calendars.first(where: { $0.id != deleteID })?.id
+        }
+
+        modelContext.delete(calendar)
+        try? modelContext.save()
+        self.deleteID = nil
     }
 }
 
 // MARK: - Row extracted to its own view to avoid type inference issues
 
 struct SidebarRow: View {
-    @Environment(GoalStore.self) private var store
-    let cal:      GoalCalendar
+    let calendar: GoalCalendar
+    let isSelected: Bool
     let onSelect: () -> Void
     let onDelete: () -> Void
 
@@ -72,22 +93,22 @@ struct SidebarRow: View {
             Button(action: onSelect) {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(cal.title)
+                        Text(calendar.title)
                             .font(.headline)
                             .foregroundStyle(.primary)
-                        let ymd = cal.elapsedYMD()
-                        let rec = StreakRecord(
-                            years:     ymd.years,
-                            months:    ymd.months,
-                            days:      ymd.days,
+                        let ymd = calendar.elapsedYMD()
+                        let record = StreakRecord(
+                            years: ymd.years,
+                            months: ymd.months,
+                            days: ymd.days,
                             savedDate: .now
                         )
-                        Text(rec.display)
+                        Text(record.display)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    if store.selectedID == cal.id {
+                    if isSelected {
                         Image(systemName: "checkmark")
                             .foregroundStyle(Color.accentColor)
                             .font(.subheadline.weight(.semibold))
@@ -107,5 +128,6 @@ struct SidebarRow: View {
 }
 
 #Preview {
-    SidebarView().environment(GoalStore())
+    SidebarView(selectedID: .constant(nil))
+        .modelContainer(for: [GoalCalendar.self, StreakRecord.self], inMemory: true)
 }
