@@ -19,10 +19,10 @@ struct CalendarView: View {
         calendar.daysSinceStart()
     }
     private var todayMonth: Int {
-        GoalCalendar.month(absoluteDay: todayAbsolute)
+        calendar.currentMonth()
     }
     private var todayYear: Int {
-        GoalCalendar.year(absoluteDay: todayAbsolute)
+        calendar.currentYear()
     }
     private var totalMonths: Int {
         calendar.totalMonths()
@@ -60,7 +60,7 @@ struct CalendarView: View {
                     Text("Month \(viewingMonth)")
                         .font(.title3.weight(.semibold))
                     // Show which year this month falls in
-                    let monthYear = GoalCalendar.year(absoluteDay: GoalCalendar.firstDay(ofMonth: viewingMonth))
+                    let monthYear = yearForDay(firstDayOfMonth(viewingMonth))
                     Text("Year \(String(format: "%02d", monthYear))")
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
@@ -155,22 +155,36 @@ struct MonthGridView: View {
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 6), count: 7)
 
     var body: some View {
-        let firstDay = GoalCalendar.firstDay(ofMonth: month)
-        let lastDay  = GoalCalendar.lastDay(ofMonth: month)
+        let first   = firstDayOfMonth(month)
+        let last    = lastDayOfMonth(month)
+        let numDays = monthLengths[month - 1]
+        
+        // Offset: how many columns to indent the first day
+        // based on total days elapsed before this month mod 7
+        // so weeks flow continuously across months
+        let offset  = first % 7
 
         VStack(spacing: 8) {
             // Column headers
             LazyVGrid(columns: columns, spacing: 6) {
-                ForEach(["1","2","3","4","5","6","7"], id: \.self) { h in
-                    Text(h)
+                
+                ForEach(0..<7, id: \.self) { col in
+                    let label = ((first % 7) + col) % 7 + 1  // shows which global weekday column
+                    Text("\(label)")
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(.tertiary)
                         .frame(maxWidth: .infinity)
                 }
+                        
+                // Empty leading cells to align first day
+                ForEach(0..<offset, id: \.self) { _ in
+                    Color.clear.aspectRatio(1, contentMode: .fit)
+                }
 
                 // Day cells
-                ForEach(firstDay...lastDay, id: \.self) { absDay in
-                    let dayNum   = GoalCalendar.dayOfMonth(absoluteDay: absDay)
+                ForEach(0..<numDays, id: \.self) { i in
+                    let absDay   = first + i
+                    let dayNum   = i + 1
                     let isToday  = absDay == todayAbsolute
                     let isPast   = absDay < todayAbsolute
                     let isFuture = absDay > todayAbsolute
@@ -181,15 +195,6 @@ struct MonthGridView: View {
                         isPast:   isPast,
                         isFuture: isFuture
                     )
-                }
-
-                // Pad remaining cells to complete the grid row
-                let remainder = 30 % 7
-                if remainder != 0 {
-                    ForEach(0..<(7 - remainder), id: \.self) { _ in
-                        Color.clear
-                            .aspectRatio(1, contentMode: .fit)
-                    }
                 }
             }
         }

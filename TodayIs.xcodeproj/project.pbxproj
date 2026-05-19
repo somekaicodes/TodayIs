@@ -19,6 +19,7 @@
 		B74E60552FBAE24000273E27 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B74E60542FBAE24000273E27 /* WidgetKit.framework */; };
 		B74E60572FBAE24000273E27 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B74E60562FBAE24000273E27 /* SwiftUI.framework */; };
 		B74E60682FBAE24100273E27 /* TodayIsWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B74E60522FBAE24000273E27 /* TodayIsWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B74E60712FBBF0AC00273E27 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = B74E606F2FBBF0AC00273E27 /* Models.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +62,7 @@
 		B74E60542FBAE24000273E27 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		B74E60562FBAE24000273E27 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		B74E606E2FBAE27400273E27 /* TodayIsWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TodayIsWidgetExtension.entitlements; sourceTree = "<group>"; };
+		B74E606F2FBBF0AC00273E27 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -74,11 +76,6 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		B74E60362FBAD11C00273E27 /* Models */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Models;
-			sourceTree = "<group>";
-		};
 		B74E60582FBAE24000273E27 /* TodayIsWidget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -126,7 +123,7 @@
 			children = (
 				B74E604D2FBAE04A00273E27 /* TodayIs.entitlements */,
 				B74E60372FBAD12500273E27 /* Views */,
-				B74E60362FBAD11C00273E27 /* Models */,
+				B74E60702FBBF0AC00273E27 /* Models */,
 				B74E60312FBAD11700273E27 /* Assets.xcassets */,
 				B74E60322FBAD11700273E27 /* TodayIsApp.swift */,
 			);
@@ -156,6 +153,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		B74E60702FBBF0AC00273E27 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B74E606F2FBBF0AC00273E27 /* Models.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -172,9 +177,6 @@
 			);
 			dependencies = (
 				B74E60672FBAE24100273E27 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				B74E60362FBAD11C00273E27 /* Models */,
 			);
 			name = TodayIs;
 			packageProductDependencies = (
@@ -272,6 +274,7 @@
 				B74E60422FBAD3E200273E27 /* CalendarView.swift in Sources */,
 				B74E603E2FBAD34D00273E27 /* SidebarView.swift in Sources */,
 				B74E603C2FBAD25700273E27 /* RootView.swift in Sources */,
+				B74E60712FBBF0AC00273E27 /* Models.swift in Sources */,
 				B74E60442FBAD44500273E27 /* ResetView.swift in Sources */,
 				B74E60482FBAD4DF00273E27 /* SplashView.swift in Sources */,
 			);
