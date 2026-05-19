@@ -67,26 +67,26 @@ struct GoalCalendar: Identifiable, Codable {
         daysSinceStart(today: today) / 365
     }
 
+    func currentDayOfMonth(today: Date = .now) -> Int {
+           daysSinceStart(today: today) % 30 + 1
+    }
+    
     /// Day-of-month (1-based) for a given absolute day index
     static func dayOfMonth(absoluteDay: Int) -> Int {
         absoluteDay % 30 + 1
     }
-
     /// Month number (1-based) for a given absolute day index
     static func month(absoluteDay: Int) -> Int {
         absoluteDay / 30 + 1
     }
-
     /// Year number (0-based) for a given absolute day index
     static func year(absoluteDay: Int) -> Int {
         absoluteDay / 365
     }
-
     /// First absolute day index of a given month (1-based month)
     static func firstDay(ofMonth month: Int) -> Int {
         (month - 1) * 30
     }
-
     /// Last absolute day index of a given month (1-based month)
     static func lastDay(ofMonth month: Int) -> Int {
         month * 30 - 1
@@ -97,6 +97,15 @@ struct GoalCalendar: Identifiable, Codable {
         daysSinceStart(today: today) / 30 + 1
     }
 }
+
+// MARK: - Shared storage key (App Groups)
+// Replace "yourname" with your actual name e.g. "group.com.kai.todayis"
+let appGroupID = "group.com.kaikim.todayis"
+ 
+func sharedDefaults() -> UserDefaults {
+    UserDefaults(suiteName: appGroupID) ?? .standard
+}
+ 
 
 // MARK: - Store (persists array of GoalCalendars)
 
@@ -148,22 +157,23 @@ final class GoalStore {
     }
 
     // MARK: Persistence
+    private let defaults = sharedDefaults()
     private let key = "goal_calendars"
     private let selKey = "selected_id"
 
     private func save() {
         if let data = try? JSONEncoder().encode(calendars) {
-            UserDefaults.standard.set(data, forKey: key)
+            defaults.set(data, forKey: key)
         }
-        UserDefaults.standard.set(selectedID?.uuidString, forKey: selKey)
+        defaults.set(selectedID?.uuidString, forKey: selKey)
     }
 
     private func load() {
-        if let data = UserDefaults.standard.data(forKey: key),
+        if let data = defaults.data(forKey: key),
            let decoded = try? JSONDecoder().decode([GoalCalendar].self, from: data) {
             calendars = decoded
         }
-        if let str = UserDefaults.standard.string(forKey: selKey),
+        if let str = defaults.string(forKey: selKey),
            let uid = UUID(uuidString: str) {
             selectedID = uid
         } else {

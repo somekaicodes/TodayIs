@@ -16,10 +16,36 @@
 		B74E60442FBAD44500273E27 /* ResetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B74E60432FBAD42B00273E27 /* ResetView.swift */; };
 		B74E60462FBAD4A200273E27 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B74E60452FBAD49E00273E27 /* HistoryView.swift */; };
 		B74E60482FBAD4DF00273E27 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B74E60472FBAD4D400273E27 /* SplashView.swift */; };
+		B74E60552FBAE24000273E27 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B74E60542FBAE24000273E27 /* WidgetKit.framework */; };
+		B74E60572FBAE24000273E27 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B74E60562FBAE24000273E27 /* SwiftUI.framework */; };
+		B74E60682FBAE24100273E27 /* TodayIsWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B74E60522FBAE24000273E27 /* TodayIsWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		B74E60662FBAE24100273E27 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B74E601A2FBABF8700273E27 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B74E60512FBAE24000273E27;
+			remoteInfo = TodayIsWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B74E606D2FBAE24100273E27 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				B74E60682FBAE24100273E27 /* TodayIsWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		B74E60222FBABF8700273E27 /* TodayIs.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = TodayIs.app; path = "/Users/kaikim/Documents/Project/TodayIs/build/Debug-iphoneos/TodayIs.app"; sourceTree = "<absolute>"; };
 		B74E60312FBAD11700273E27 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B74E60322FBAD11700273E27 /* TodayIsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayIsApp.swift; sourceTree = "<group>"; };
 		B74E603B2FBAD25400273E27 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
@@ -29,12 +55,36 @@
 		B74E60432FBAD42B00273E27 /* ResetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetView.swift; sourceTree = "<group>"; };
 		B74E60452FBAD49E00273E27 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		B74E60472FBAD4D400273E27 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
+		B74E604A2FBADE1E00273E27 /* TodayIs.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TodayIs.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B74E604D2FBAE04A00273E27 /* TodayIs.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TodayIs.entitlements; sourceTree = "<group>"; };
+		B74E60522FBAE24000273E27 /* TodayIsWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TodayIsWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B74E60542FBAE24000273E27 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		B74E60562FBAE24000273E27 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		B74E606E2FBAE27400273E27 /* TodayIsWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TodayIsWidgetExtension.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		B74E60692FBAE24100273E27 /* Exceptions for "TodayIsWidget" folder in "TodayIsWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = B74E60512FBAE24000273E27 /* TodayIsWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		B74E60362FBAD11C00273E27 /* Models */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Models;
+			sourceTree = "<group>";
+		};
+		B74E60582FBAE24000273E27 /* TodayIsWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				B74E60692FBAE24100273E27 /* Exceptions for "TodayIsWidget" folder in "TodayIsWidgetExtension" target */,
+			);
+			path = TodayIsWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -47,19 +97,34 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B74E604F2FBAE24000273E27 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B74E60572FBAE24000273E27 /* SwiftUI.framework in Frameworks */,
+				B74E60552FBAE24000273E27 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		B74E60192FBABF8700273E27 = {
 			isa = PBXGroup;
 			children = (
+				B74E606E2FBAE27400273E27 /* TodayIsWidgetExtension.entitlements */,
 				B74E60332FBAD11700273E27 /* TodayIs */,
+				B74E604A2FBADE1E00273E27 /* TodayIs.app */,
+				B74E60522FBAE24000273E27 /* TodayIsWidgetExtension.appex */,
+				B74E60582FBAE24000273E27 /* TodayIsWidget */,
+				B74E60532FBAE24000273E27 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
 		B74E60332FBAD11700273E27 /* TodayIs */ = {
 			isa = PBXGroup;
 			children = (
+				B74E604D2FBAE04A00273E27 /* TodayIs.entitlements */,
 				B74E60372FBAD12500273E27 /* Views */,
 				B74E60362FBAD11C00273E27 /* Models */,
 				B74E60312FBAD11700273E27 /* Assets.xcassets */,
@@ -82,6 +147,15 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		B74E60532FBAE24000273E27 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B74E60542FBAE24000273E27 /* WidgetKit.framework */,
+				B74E60562FBAE24000273E27 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -92,10 +166,12 @@
 				B74E601E2FBABF8700273E27 /* Sources */,
 				B74E601F2FBABF8700273E27 /* Frameworks */,
 				B74E60202FBABF8700273E27 /* Resources */,
+				B74E606D2FBAE24100273E27 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				B74E60672FBAE24100273E27 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				B74E60362FBAD11C00273E27 /* Models */,
@@ -104,8 +180,30 @@
 			packageProductDependencies = (
 			);
 			productName = TodayIs;
-			productReference = B74E60222FBABF8700273E27 /* TodayIs.app */;
+			productReference = B74E604A2FBADE1E00273E27 /* TodayIs.app */;
 			productType = "com.apple.product-type.application";
+		};
+		B74E60512FBAE24000273E27 /* TodayIsWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B74E606A2FBAE24100273E27 /* Build configuration list for PBXNativeTarget "TodayIsWidgetExtension" */;
+			buildPhases = (
+				B74E604E2FBAE24000273E27 /* Sources */,
+				B74E604F2FBAE24000273E27 /* Frameworks */,
+				B74E60502FBAE24000273E27 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				B74E60582FBAE24000273E27 /* TodayIsWidget */,
+			);
+			name = TodayIsWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = TodayIsWidgetExtension;
+			productReference = B74E60522FBAE24000273E27 /* TodayIsWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -118,6 +216,9 @@
 				LastUpgradeCheck = 2650;
 				TargetAttributes = {
 					B74E60212FBABF8700273E27 = {
+						CreatedOnToolsVersion = 26.5;
+					};
+					B74E60512FBAE24000273E27 = {
 						CreatedOnToolsVersion = 26.5;
 					};
 				};
@@ -137,6 +238,7 @@
 			projectRoot = "";
 			targets = (
 				B74E60212FBABF8700273E27 /* TodayIs */,
+				B74E60512FBAE24000273E27 /* TodayIsWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -147,6 +249,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				B74E60342FBAD11700273E27 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B74E60502FBAE24000273E27 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -168,7 +277,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B74E604E2FBAE24000273E27 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B74E60672FBAE24100273E27 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B74E60512FBAE24000273E27 /* TodayIsWidgetExtension */;
+			targetProxy = B74E60662FBAE24100273E27 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		B74E602B2FBABF8800273E27 /* Debug */ = {
@@ -297,6 +421,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = TodayIs/TodayIs.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = NTDG5S8K4Y;
@@ -329,6 +454,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = TodayIs/TodayIs.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = NTDG5S8K4Y;
@@ -356,6 +482,68 @@
 			};
 			name = Release;
 		};
+		B74E606B2FBAE24100273E27 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = TodayIsWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = NTDG5S8K4Y;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TodayIsWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TodayIsWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kaikim.TodayIs.TodayIsWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B74E606C2FBAE24100273E27 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = TodayIsWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = NTDG5S8K4Y;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TodayIsWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TodayIsWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kaikim.TodayIs.TodayIsWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -373,6 +561,15 @@
 			buildConfigurations = (
 				B74E602E2FBABF8800273E27 /* Debug */,
 				B74E602F2FBABF8800273E27 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B74E606A2FBAE24100273E27 /* Build configuration list for PBXNativeTarget "TodayIsWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B74E606B2FBAE24100273E27 /* Debug */,
+				B74E606C2FBAE24100273E27 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
