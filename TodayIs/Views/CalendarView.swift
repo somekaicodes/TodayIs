@@ -156,7 +156,6 @@ struct MonthGridView: View {
 
     var body: some View {
         let first   = firstDayOfMonth(month)
-        let last    = lastDayOfMonth(month)
         let numDays = monthLengths[month - 1]
         
         // Offset: how many columns to indent the first day
