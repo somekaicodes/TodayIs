@@ -90,6 +90,7 @@ struct CalendarView: View {
                     )
                     .tag(month)
                     .padding(.horizontal)
+                    .frame(maxHeight: .infinity, alignment: .top)
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
@@ -178,9 +179,15 @@ struct MonthGridView: View {
             // ── Day cells with leading offset ──
             LazyVGrid(columns: columns, spacing: 4) {
  
-                // blank cells to push day 1 to correct column
-                ForEach(0..<offset, id: \.self) { _ in
-                    Color.clear.aspectRatio(1, contentMode: .fit)
+                // blank cells to push day 1 to correct column.
+                // IDs are shifted by numDays so they never collide with
+                // the day-cell IDs below (otherwise SwiftUI dedupes the
+                // first `offset` day cells against the blanks).
+                ForEach(numDays..<(numDays + offset), id: \.self) { _ in
+                    Color(.secondarySystemBackground)
+                        .aspectRatio(1, contentMode: .fit)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .opacity(0)
                 }
  
                 // actual day cells
