@@ -163,31 +163,34 @@ struct MonthGridView: View {
         // so weeks flow continuously across months
         let offset  = first % 7
 
-        VStack(spacing: 8) {
-            // Column headers
-            LazyVGrid(columns: columns, spacing: 6) {
-                
-                ForEach(0..<7, id: \.self) { col in
-                    let label = ((first % 7) + col) % 7 + 1  // shows which global weekday column
-                    Text("\(label)")
+        VStack(spacing: 4) {
+         
+            // ── Fixed column headers: always 1-7 ──
+            LazyVGrid(columns: columns, spacing: 4) {
+                ForEach(1...7, id: \.self) { col in
+                    Text("\(col)")
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(.tertiary)
                         .frame(maxWidth: .infinity)
                 }
-                        
-                // Empty leading cells to align first day
+            }
+         
+            // ── Day cells with leading offset ──
+            LazyVGrid(columns: columns, spacing: 4) {
+ 
+                // blank cells to push day 1 to correct column
                 ForEach(0..<offset, id: \.self) { _ in
                     Color.clear.aspectRatio(1, contentMode: .fit)
                 }
-
-                // Day cells
+ 
+                // actual day cells
                 ForEach(0..<numDays, id: \.self) { i in
                     let absDay   = first + i
                     let dayNum   = i + 1
                     let isToday  = absDay == todayAbsolute
                     let isPast   = absDay < todayAbsolute
                     let isFuture = absDay > todayAbsolute
-
+ 
                     DayCellView(
                         number:   dayNum,
                         isToday:  isToday,
