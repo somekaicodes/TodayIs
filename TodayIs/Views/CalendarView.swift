@@ -101,7 +101,8 @@ struct CalendarView: View {
                     )
                     .tag(index)
                     .padding(.horizontal)
-                    .frame(maxHeight: .infinity, alignment: .top)
+                    .padding(.bottom, 60)
+                    .frame(maxHeight: .infinity, alignment: .center)
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
