@@ -11,7 +11,9 @@ import SwiftUI
 struct CalendarView: View {
     let calendar: GoalCalendar
 
-    @State private var viewingMonth: Int = 1
+    // Absolute month index from start: year * 12 + (month - 1).
+    // year 0, month 1 → 0;  year 2, month 2 → 25.
+    @State private var viewingIndex: Int = 0
     @State private var showReset   = false
     @State private var showHistory = false
 
@@ -24,8 +26,17 @@ struct CalendarView: View {
     private var todayYear: Int {
         calendar.currentYear()
     }
-    private var totalMonths: Int {
-        calendar.totalMonths()
+    private var todayIndex: Int {
+        todayYear * 12 + (todayMonth - 1)
+    }
+    private var viewingYear: Int {
+        viewingIndex / 12
+    }
+    private var viewingMonth: Int {
+        (viewingIndex % 12) + 1
+    }
+    private var maxIndex: Int {
+        todayIndex + 1
     }
 
     var body: some View {
@@ -46,22 +57,20 @@ struct CalendarView: View {
             // ── Month navigator ──
             HStack {
                 Button {
-                    if viewingMonth > 1 { viewingMonth -= 1 }
+                    if viewingIndex > 0 { viewingIndex -= 1 }
                 } label: {
                     Image(systemName: "chevron.left")
                         .font(.headline)
                         .frame(width: 44, height: 44)
                 }
-                .disabled(viewingMonth <= 1)
+                .disabled(viewingIndex <= 0)
 
                 Spacer()
 
                 VStack(spacing: 2) {
                     Text("Month \(viewingMonth)")
                         .font(.title3.weight(.semibold))
-                    // Show which year this month falls in
-                    let monthYear = yearForDay(firstDayOfMonth(viewingMonth))
-                    Text("Year \(String(format: "%02d", monthYear))")
+                    Text("Year \(String(format: "%02d", viewingYear))")
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
                 }
@@ -69,12 +78,13 @@ struct CalendarView: View {
                 Spacer()
 
                 Button {
-                    if viewingMonth < totalMonths + 1 { viewingMonth += 1 }
+                    if viewingIndex < maxIndex { viewingIndex += 1 }
                 } label: {
                     Image(systemName: "chevron.right")
                         .font(.headline)
                         .frame(width: 44, height: 44)
                 }
+                .disabled(viewingIndex >= maxIndex)
             }
             .padding(.horizontal, 8)
 
@@ -82,19 +92,20 @@ struct CalendarView: View {
                 .padding(.top, 8)
 
             // ── Calendar grid (swipeable) ──
-            TabView(selection: $viewingMonth) {
-                ForEach(1...(max(totalMonths + 1, 2)), id: \.self) { month in
+            TabView(selection: $viewingIndex) {
+                ForEach(0...max(maxIndex, 1), id: \.self) { index in
                     MonthGridView(
-                        month:        month,
+                        year:         index / 12,
+                        month:        (index % 12) + 1,
                         todayAbsolute: todayAbsolute
                     )
-                    .tag(month)
+                    .tag(index)
                     .padding(.horizontal)
                     .frame(maxHeight: .infinity, alignment: .top)
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
-            .animation(.easeInOut(duration: 0.25), value: viewingMonth)
+            .animation(.easeInOut(duration: 0.25), value: viewingIndex)
 
             Divider()
 
@@ -133,10 +144,10 @@ struct CalendarView: View {
             .padding(.vertical, 12)
         }
         .onAppear {
-            viewingMonth = todayMonth
+            viewingIndex = todayIndex
         }
         .onChange(of: calendar.id) { _, _ in
-            viewingMonth = todayMonth
+            viewingIndex = todayIndex
         }
         .sheet(isPresented: $showReset) {
             ResetView(calendar: calendar)
@@ -152,6 +163,7 @@ struct CalendarView: View {
 // MARK: - Month grid
 
 struct MonthGridView: View {
+    let year:          Int
     let month:         Int
     let todayAbsolute: Int
 
@@ -159,12 +171,13 @@ struct MonthGridView: View {
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 6), count: 7)
 
     var body: some View {
-        let first   = firstDayOfMonth(month)
+        // Absolute day index of day 1 of this (year, month)
+        let first   = year * 365 + firstDayOfMonth(month)
         let numDays = monthLengths[month - 1]
-        
+
         // Offset: how many columns to indent the first day
         // based on total days elapsed before this month mod 7
-        // so weeks flow continuously across months
+        // so weeks flow continuously across months and years
         let offset  = first % 7
 
         VStack(spacing: 4) {
