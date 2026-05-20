@@ -135,6 +135,9 @@ struct CalendarView: View {
         .onAppear {
             viewingMonth = todayMonth
         }
+        .onChange(of: calendar.id) { _, _ in
+            viewingMonth = todayMonth
+        }
         .sheet(isPresented: $showReset) {
             ResetView(calendar: calendar)
                 .presentationDetents([.medium])
