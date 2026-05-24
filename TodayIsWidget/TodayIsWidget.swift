@@ -82,10 +82,17 @@ struct SelectCalendarIntent: WidgetConfigurationIntent {
 
 struct CalendarEntry: TimelineEntry {
     let date:        Date
+    let id:          UUID?      // nil in placeholder/empty states
     let title:       String
     let month:       Int
     let day:         Int
     let year:        Int
+}
+
+/// URL the widget hands to the system when tapped. The host app's
+/// onOpenURL handler parses this and switches the visible goal.
+func widgetDeepLink(for id: UUID) -> URL? {
+    URL(string: "todayis://goal/\(id.uuidString)")
 }
 
 // MARK: - Provider
@@ -95,7 +102,7 @@ struct CalendarProvider: AppIntentTimelineProvider {
     typealias Intent = SelectCalendarIntent
 
     func placeholder(in context: Context) -> CalendarEntry {
-        CalendarEntry(date: .now, title: "Morning Runs 🏃", month: 1, day: 1, year: 0)
+        CalendarEntry(date: .now, id: nil, title: "Morning Runs 🏃", month: 1, day: 1, year: 0)
     }
 
     func snapshot(for intent: SelectCalendarIntent, in context: Context) async -> CalendarEntry {
@@ -117,23 +124,24 @@ struct CalendarProvider: AppIntentTimelineProvider {
 
         // No goals at all → ask the user to create one.
         guard !calendars.isEmpty else {
-            return CalendarEntry(date: .now, title: "No goal yet", month: 0, day: 0, year: 0)
+            return CalendarEntry(date: .now, id: nil, title: "No goal yet", month: 0, day: 0, year: 0)
         }
 
         // No selection → don't silently default; prompt the user.
         guard let selectedID = intent.calendar?.id else {
-            return CalendarEntry(date: .now, title: "Tap & hold to pick a goal", month: 0, day: 0, year: 0)
+            return CalendarEntry(date: .now, id: nil, title: "Tap & hold to pick a goal", month: 0, day: 0, year: 0)
         }
 
         // Selected ID isn't in the snapshot (e.g. snapshot is stale or the
         // goal was deleted). Surface that explicitly instead of falling
         // back to the first calendar.
         guard let cal = calendars.first(where: { $0.id == selectedID }) else {
-            return CalendarEntry(date: .now, title: "Goal unavailable", month: 0, day: 0, year: 0)
+            return CalendarEntry(date: .now, id: nil, title: "Goal unavailable", month: 0, day: 0, year: 0)
         }
 
         return CalendarEntry(
             date:  .now,
+            id:    cal.id,
             title: cal.title,
             month: cal.currentMonth(),
             day:   cal.currentDay(),
@@ -162,49 +170,54 @@ struct TodayIsWidgetView: View {
                     .padding(14)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             } else {
-                VStack(alignment: .leading, spacing: 6) {
-                    // Goal name — pushed down slightly
-                    Text(entry.title)
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                        .padding(.top, 8)
-
-                    Spacer(minLength: 0)
-
-                    VStack(alignment: .leading, spacing: 0) {
-                        Text("Month")
-                            .font(.system(size: 11, weight: .regular))
-                            .foregroundStyle(.tertiary)
-                        Text("\(entry.month)")
-                            .font(.system(size: 48, weight: .semibold))
-                            .foregroundStyle(.primary)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.5)
-                    }
-
-                    VStack(alignment: .leading, spacing: 0) {
-                        Text("Day")
-                            .font(.system(size: 11, weight: .regular))
-                            .foregroundStyle(.tertiary)
-                        Text("\(entry.day)")
-                            .font(.system(size: 32, weight: .medium))
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
-
-                    Spacer(minLength: 0)
-
-                    // Year — lifted up slightly
-                    Text("Year \(String(format: "%02d", entry.year))")
-                        .font(.system(size: 11, weight: .regular))
-                        .foregroundStyle(.tertiary)
-                        .padding(.bottom, 8)
-                }
-                .padding(14)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                contentBody
+                    .widgetURL(entry.id.flatMap(widgetDeepLink(for:)))
             }
         }
+    }
+
+    private var contentBody: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            // Goal name — pushed down slightly
+            Text(entry.title)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .padding(.top, 8)
+
+            Spacer(minLength: 0)
+
+            VStack(alignment: .leading, spacing: 0) {
+                Text("Month")
+                    .font(.system(size: 11, weight: .regular))
+                    .foregroundStyle(.tertiary)
+                Text("\(entry.month)")
+                    .font(.system(size: 48, weight: .semibold))
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+            }
+
+            VStack(alignment: .leading, spacing: 0) {
+                Text("Day")
+                    .font(.system(size: 11, weight: .regular))
+                    .foregroundStyle(.tertiary)
+                Text("\(entry.day)")
+                    .font(.system(size: 32, weight: .medium))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+
+            Spacer(minLength: 0)
+
+            // Year — lifted up slightly
+            Text("Year \(String(format: "%02d", entry.year))")
+                .font(.system(size: 11, weight: .regular))
+                .foregroundStyle(.tertiary)
+                .padding(.bottom, 8)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     }
 }
 
@@ -233,5 +246,5 @@ struct TodayIsWidget: Widget {
 #Preview(as: .systemSmall) {
     TodayIsWidget()
 } timeline: {
-    CalendarEntry(date: .now, title: "Morning Runs 🏃", month: 2, day: 11, year: 0)
+    CalendarEntry(date: .now, id: UUID(), title: "Morning Runs 🏃", month: 2, day: 11, year: 0)
 }
