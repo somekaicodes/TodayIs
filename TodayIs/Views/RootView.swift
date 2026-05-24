@@ -13,6 +13,7 @@ struct RootView: View {
     @State private var selectedID: UUID?
     @State private var showNewCalendar = false
     @State private var showSidebar = false
+    @Environment(\.scenePhase) private var scenePhase
 
     private var selectedCalendar: GoalCalendar? {
         if let selectedID,
@@ -20,6 +21,14 @@ struct RootView: View {
             return calendar
         }
         return calendars.first
+    }
+
+    // Key that changes whenever any calendar's id, title or startDate
+    // changes — used to trigger widget-data re-sync.
+    private var widgetSyncKey: String {
+        calendars
+            .map { "\($0.id.uuidString)|\($0.title)|\($0.startDate.timeIntervalSince1970)" }
+            .joined(separator: ",")
     }
 
     var body: some View {
@@ -53,9 +62,18 @@ struct RootView: View {
                 }
             }
         }
-        .onAppear(perform: refreshSelection)
+        .onAppear {
+            refreshSelection()
+            consumePendingCalendarSelection()
+        }
         .onChange(of: calendars.map(\.id)) { _, _ in
             refreshSelection()
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { consumePendingCalendarSelection() }
+        }
+        .task(id: widgetSyncKey) {
+            syncWidgetData(calendars: calendars)
         }
         .sheet(isPresented: $showSidebar) {
             SidebarView(selectedID: $selectedID)
@@ -72,6 +90,18 @@ struct RootView: View {
             return
         }
         selectedID = calendars.first?.id
+    }
+
+    /// Picks up a calendar ID written by the widget's OpenGoalIntent
+    /// (in shared App Group UserDefaults) and switches the visible goal.
+    private func consumePendingCalendarSelection() {
+        guard let defaults = UserDefaults(suiteName: appGroupID),
+              let idStr = defaults.string(forKey: "pending_calendar_id"),
+              let id = UUID(uuidString: idStr) else { return }
+        defaults.removeObject(forKey: "pending_calendar_id")
+        if calendars.contains(where: { $0.id == id }) {
+            selectedID = id
+        }
     }
 }
 

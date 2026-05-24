@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftData
+import WidgetKit
 
 // MARK: - Month lengths (real calendar, 365 days total)
 
@@ -147,3 +148,27 @@ func makeTodayIsModelContainer(inMemory: Bool = false) throws -> ModelContainer 
     )
     return try ModelContainer(for: schema, configurations: [configuration])
 }
+// MARK: - Widget data sync
+
+/// Snapshot of a calendar written to shared UserDefaults so the widget
+/// (which doesn't share the SwiftData store target membership) can read it.
+struct GoalCalendarSnapshot: Codable {
+    let id:        UUID
+    let title:     String
+    let startDate: Date
+}
+
+let widgetCalendarsKey = "goal_calendars"
+
+/// Writes a JSON snapshot of all calendars to the shared App Group
+/// UserDefaults and asks WidgetKit to refresh.
+func syncWidgetData(calendars: [GoalCalendar]) {
+    let snapshots = calendars.map {
+        GoalCalendarSnapshot(id: $0.id, title: $0.title, startDate: $0.startDate)
+    }
+    guard let data = try? JSONEncoder().encode(snapshots),
+          let defaults = UserDefaults(suiteName: appGroupID) else { return }
+    defaults.set(data, forKey: widgetCalendarsKey)
+    WidgetCenter.shared.reloadAllTimelines()
+}
+

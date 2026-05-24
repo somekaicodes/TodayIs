@@ -29,7 +29,7 @@ struct GoalCalendarInfo: Codable, Identifiable {
 }
 
 func loadCalendars() -> [GoalCalendarInfo] {
-    let defaults = UserDefaults(suiteName: "group.com.yourname.todayis") ?? .standard
+    let defaults = UserDefaults(suiteName: "group.com.kaikim.todayis") ?? .standard
     guard let data = defaults.data(forKey: "goal_calendars"),
           let decoded = try? JSONDecoder().decode([GoalCalendarInfo].self, from: data)
     else { return [] }
@@ -61,8 +61,10 @@ struct CalendarQuery: EntityQuery {
         loadCalendars().map { CalendarAppEntity(id: $0.id, title: $0.title) }
     }
 
+    // Return nil so iOS prompts the user to pick a goal rather than
+    // silently defaulting to the first calendar.
     func defaultResult() async -> CalendarAppEntity? {
-        loadCalendars().first.map { CalendarAppEntity(id: $0.id, title: $0.title) }
+        nil
     }
 }
 
@@ -112,15 +114,22 @@ struct CalendarProvider: AppIntentTimelineProvider {
 
     private func makeEntry(for intent: SelectCalendarIntent) -> CalendarEntry {
         let calendars = loadCalendars()
-        let cal: GoalCalendarInfo
 
-        if let selectedID = intent.calendar?.id,
-           let match = calendars.first(where: { $0.id == selectedID }) {
-            cal = match
-        } else if let first = calendars.first {
-            cal = first
-        } else {
-            return CalendarEntry(date: .now, title: "No goal yet", month: 1, day: 1, year: 0)
+        // No goals at all → ask the user to create one.
+        guard !calendars.isEmpty else {
+            return CalendarEntry(date: .now, title: "No goal yet", month: 0, day: 0, year: 0)
+        }
+
+        // No selection → don't silently default; prompt the user.
+        guard let selectedID = intent.calendar?.id else {
+            return CalendarEntry(date: .now, title: "Tap & hold to pick a goal", month: 0, day: 0, year: 0)
+        }
+
+        // Selected ID isn't in the snapshot (e.g. snapshot is stale or the
+        // goal was deleted). Surface that explicitly instead of falling
+        // back to the first calendar.
+        guard let cal = calendars.first(where: { $0.id == selectedID }) else {
+            return CalendarEntry(date: .now, title: "Goal unavailable", month: 0, day: 0, year: 0)
         }
 
         return CalendarEntry(
@@ -137,53 +146,64 @@ struct CalendarProvider: AppIntentTimelineProvider {
 
 struct TodayIsWidgetView: View {
     let entry: CalendarEntry
-    @Environment(\.widgetFamily) var family
+
+    // month == 0 means we're in a placeholder/empty state.
+    private var isPlaceholder: Bool { entry.month == 0 }
 
     var body: some View {
         ZStack {
             Color(.systemBackground)
 
-            VStack(alignment: .leading, spacing: 6) {
-                // Goal name
+            if isPlaceholder {
                 Text(entry.title)
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.system(size: 15, weight: .medium))
                     .foregroundStyle(.secondary)
-                    .lineLimit(1)
-
-                Spacer()
-
-                // Month large
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("Month")
-                        .font(.system(size: 11, weight: .regular))
-                        .foregroundStyle(.tertiary)
-                    Text("\(entry.month)")
-                        .font(.system(size: family == .systemSmall ? 48 : 56, weight: .semibold))
-                        .foregroundStyle(.primary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.5)
-                }
-
-                // Day smaller but still prominent
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("Day")
-                        .font(.system(size: 11, weight: .regular))
-                        .foregroundStyle(.tertiary)
-                    Text("\(entry.day)")
-                        .font(.system(size: family == .systemSmall ? 32 : 40, weight: .medium))
+                    .multilineTextAlignment(.center)
+                    .padding(14)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+            } else {
+                VStack(alignment: .leading, spacing: 6) {
+                    // Goal name — pushed down slightly
+                    Text(entry.title)
+                        .font(.system(size: 13, weight: .medium))
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
+                        .padding(.top, 8)
+
+                    Spacer(minLength: 0)
+
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text("Month")
+                            .font(.system(size: 11, weight: .regular))
+                            .foregroundStyle(.tertiary)
+                        Text("\(entry.month)")
+                            .font(.system(size: 48, weight: .semibold))
+                            .foregroundStyle(.primary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
+                    }
+
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text("Day")
+                            .font(.system(size: 11, weight: .regular))
+                            .foregroundStyle(.tertiary)
+                        Text("\(entry.day)")
+                            .font(.system(size: 32, weight: .medium))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    // Year — lifted up slightly
+                    Text("Year \(String(format: "%02d", entry.year))")
+                        .font(.system(size: 11, weight: .regular))
+                        .foregroundStyle(.tertiary)
+                        .padding(.bottom, 8)
                 }
-
-                Spacer()
-
-                // Year small at bottom
-                Text("Year \(String(format: "%02d", entry.year))")
-                    .font(.system(size: 11, weight: .regular))
-                    .foregroundStyle(.tertiary)
+                .padding(14)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
             }
-            .padding(14)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         }
     }
 }
@@ -204,7 +224,7 @@ struct TodayIsWidget: Widget {
         }
         .configurationDisplayName("Today is ...")
         .description("See what day it is in your personal goal calendar.")
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .supportedFamilies([.systemSmall])
     }
 }
 
