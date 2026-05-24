@@ -94,13 +94,25 @@ struct RootView: View {
 
     /// Picks up a calendar ID written by the widget's OpenGoalIntent
     /// (in shared App Group UserDefaults) and switches the visible goal.
+    ///
+    /// The widget's `perform()` runs in the widget-extension process, so
+    /// there's a small lag before its UserDefaults write is visible here.
+    /// Retry a few times to absorb the cross-process sync delay.
     private func consumePendingCalendarSelection() {
-        guard let defaults = UserDefaults(suiteName: appGroupID),
-              let idStr = defaults.string(forKey: "pending_calendar_id"),
-              let id = UUID(uuidString: idStr) else { return }
-        defaults.removeObject(forKey: "pending_calendar_id")
-        if calendars.contains(where: { $0.id == id }) {
-            selectedID = id
+        Task { @MainActor in
+            for attempt in 0..<6 {
+                if attempt > 0 {
+                    try? await Task.sleep(nanoseconds: 150_000_000) // 0.15s
+                }
+                guard let defaults = UserDefaults(suiteName: appGroupID),
+                      let idStr = defaults.string(forKey: "pending_calendar_id"),
+                      let id = UUID(uuidString: idStr) else { continue }
+                defaults.removeObject(forKey: "pending_calendar_id")
+                if calendars.contains(where: { $0.id == id }) {
+                    selectedID = id
+                }
+                return
+            }
         }
     }
 }
