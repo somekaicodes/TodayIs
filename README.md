@@ -25,12 +25,22 @@ Each goal gets its own calendar starting from the day you committed to it. The f
 
 ## Screenshots
 
+**App**
+
 <p float="left">
   <img src="screenshots/empty.png" width="18%" />
   <img src="screenshots/calendar.png" width="18%" />
   <img src="screenshots/sidebar.png" width="18%" />
   <img src="screenshots/reset.png" width="18%" />
   <img src="screenshots/history.png" width="18%" />
+</p>
+
+**Widget & Cloud Sync**
+
+<p float="left">
+  <img src="screenshots/widget_select.png" width="28%" />
+  <img src="screenshots/widget_home.png" width="28%" />
+  <img src="screenshots/account.png" width="28%" />
 </p>
 
 ---
@@ -44,14 +54,27 @@ Each goal gets its own calendar starting from the day you committed to it. The f
 - Streak history is editable (can only be reduced, not inflated)
 - Sidebar to switch between goal calendars
 
+### Home Screen Widget
+- Small widget that shows the current month, day, and year for any goal
+- Tap and hold to pick which goal calendar to display
+- Refreshes daily at midnight
+
+### Cloud Sync (Google Sign-In)
+- Sign in with Google to sync all your goal calendars across devices
+- Data is backed up to Firebase automatically on every change
+- Sign-in is opt-in — the app works fully offline without an account
+- On first sign-in: existing cloud data is downloaded, or local data is uploaded
+
 ---
 
 ## Built With
 
-- Swift
-- SwiftUI
-- UserDefaults (local persistence)
-- Xcode 15
+- Swift / SwiftUI
+- SwiftData (local persistence)
+- WidgetKit
+- Firebase (Firestore + Auth)
+- Google Sign-In
+- Xcode 26
 - iOS 17+
 
 ---
