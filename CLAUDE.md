@@ -62,15 +62,46 @@ The widget has its own simplified copy of these calculations (using 30-day month
 | File | Purpose |
 |------|---------|
 | `TodayIs/Models/Models.swift` | SwiftData models, all day/month/year math helpers, widget sync |
-| `TodayIs/TodayIsApp.swift` | App entry point, SwiftData container setup |
-| `TodayIs/Views/RootView.swift` | Nav shell, empty state, sidebar + new calendar sheets, widget deep-link handling |
+| `TodayIs/TodayIsApp.swift` | App entry point, Firebase setup, SwiftData container |
+| `TodayIs/Services/AuthService.swift` | Firebase Auth — Google Sign-In + Sign in with Apple |
+| `TodayIs/Services/FirestoreService.swift` | Firestore CRUD — upload/download GoalCalendar + StreakRecord |
+| `TodayIs/Views/RootView.swift` | Nav shell, toolbar with account button, Firestore sync on sign-in |
+| `TodayIs/Views/AccountView.swift` | Profile sheet — shows sign-in options or signed-in profile + sign-out |
+| `TodayIs/Views/SignInView.swift` | Google + Apple sign-in buttons |
 | `TodayIs/Views/SidebarView.swift` | List of goal calendars to switch between |
 | `TodayIs/Views/NewCalendarView.swift` | Sheet for creating a new calendar |
 | `TodayIs/Views/CalendarView.swift` | Month grid view with swipeable months, streak display, reset/history buttons |
 | `TodayIs/Views/ResetView.swift` | Reset streak (saves current streak to history first) |
 | `TodayIs/Views/HistoryView.swift` | Editable list of past streaks |
 | `TodayIs/Views/SplashView.swift` | Launch screen |
-| `TodayIsWidget/TodayIsWidget.swift` | WidgetKit extension — small widget showing current month/day/year for a selected goal |
+| `TodayIsWidget/TodayIsWidget.swift` | WidgetKit extension — small widget showing current month/day/year |
+
+---
+
+## Firebase architecture
+
+### Auth
+- `AuthService` is `@Observable @MainActor` — injected via `.environment(authService)` from `TodayIsApp`
+- Supports **Google Sign-In** and **Sign in with Apple**
+- Auth state is mirrored into `AuthService.user` via `Auth.auth().addStateDidChangeListener`
+- Sign-in is **opt-in** — the app works fully offline without an account
+
+### Firestore data structure
+```
+users/{userID}/
+  calendars/{calendarID}    { id, title, startDate }
+    streaks/{recordID}      { id, years, months, days, savedDate }
+```
+
+### Sync strategy
+- **SwiftData is the local source of truth** — the app always works offline
+- On **fresh sign-in**: if the user has cloud data → download into SwiftData (cloud wins); else → upload local data to Firestore
+- On **any calendar change**: `RootView.widgetSyncKey` fires `.task` which uploads to Firestore (if signed in) and refreshes the widget
+- On **sign-out**: local SwiftData is left untouched
+
+### Required Swift packages (add via Xcode → File → Add Package Dependencies)
+- `https://github.com/firebase/firebase-ios-sdk` — add: FirebaseAuth, FirebaseFirestore, FirebaseCore
+- `https://github.com/google/GoogleSignIn-iOS` — add: GoogleSignIn, GoogleSignInSwift
 
 ---
 
@@ -79,7 +110,7 @@ The widget has its own simplified copy of these calculations (using 30-day month
 - **Size:** systemSmall only
 - **Configuration:** user picks which goal calendar to display via `SelectCalendarIntent` (AppIntents)
 - **Data flow:** app writes JSON snapshot to shared UserDefaults (`goal_calendars` key) → widget reads on timeline refresh
-- **Deep-link:** when the user taps the widget, `OpenGoalIntent` writes `pending_calendar_id` to shared UserDefaults; `RootView.consumePendingCalendarSelection()` picks it up on foreground with retry logic (cross-process sync delay)
+- **Deep-link:** `RootView.handleDeepLink` handles `todayis://goal/<uuid>` URLs from the widget
 - Widget refreshes daily at midnight
 
 ---
@@ -90,3 +121,4 @@ The widget has its own simplified copy of these calculations (using 30-day month
 - **Current month on open:** CalendarView initializes `viewingIndex = todayIndex` in `.onAppear` — without this it defaulted to month 1 every time
 - **Widget can't use SwiftData:** The widget target can't include the app's SwiftData models, so `GoalCalendarInfo` is a self-contained struct in the widget file that duplicates the date math
 - **Widget uses 30-day months** in its `currentMonth()`/`currentDay()` calculations (simplified), while the main app uses real month lengths — these will drift apart over long streaks
+- **Apple Sign-In requires a capability:** the Xcode target needs "Sign in with Apple" enabled under Signing & Capabilities, otherwise the auth flow crashes silently
