@@ -35,11 +35,17 @@ Each goal gets its own calendar starting from the day you committed to it. The f
   <img src="screenshots/history.png" width="18%" />
 </p>
 
-**Widget & Cloud Sync**
+**Widget**
 
 <p float="left">
   <img src="screenshots/widget_select.png" width="28%" />
   <img src="screenshots/widget_home.png" width="28%" />
+</p>
+
+**Google Sign-In & Cloud Sync**
+
+<p float="left">
+  <img src="screenshots/sign_in.png" width="28%" />
   <img src="screenshots/account.png" width="28%" />
 </p>
 
